@@ -2,11 +2,16 @@
 
 Bu klasörde iki kamuya açık UCI veri seti ve özel kaynaklı hal faturaları bulunmaktadır.
 
-## 1. `sinav_notlari.csv` — Sentetik sınav notu verileri
+## 1. `student-por.csv` — UCI Student Performance (gerçek veri)
 
-- **Kaynak:** Eğitim gösterimi için yapay oluşturulmuş 80 kayıt; gerçek öğrencilerden elde edilmemiştir.
-- **Kolonlar:** CalismaSaati (0–6 saat), SinavNotu (0–100 puan).
-- **Sınır:** Gerçek hayat başarısını temsil etmez; modelin amacı ML.NET regresyon kodunu öğretmektir.
+- **Kaynak:** UCI Machine Learning Repository, Student Performance (ID 320)
+- **Atıf:** Cortez, P., & Silva, A. (2008). *Using Data Mining to Predict Secondary School Student Performance.*
+- **Lisans:** CC BY 4.0 (UCI)
+- **İçerik:** Portekiz'de iki okulun dil dersi öğrencileri, 649 satır, 33 sütun (2005-2006)
+- **Kullanılan alanlar:** studytime (haftalık kategori 1-4), failures, higher, absences, G1, G2 → hedef G3 (0-20)
+- **Türetilmiş dosya:** `sinav_notu_model.csv` — `araclar/student_por_hazirla.py` üretir
+  (higher: yes→1/no→0; studytime kategorisi korunur; G1-G2-G3 0-20 aralığında kalır)
+- **Ham açıklama:** `student-por-aciklama.txt` (UCI'nin kendi sütun sözlüğü)
 
 ## 2. `duygu.csv` — Yorum duygu analizi
 

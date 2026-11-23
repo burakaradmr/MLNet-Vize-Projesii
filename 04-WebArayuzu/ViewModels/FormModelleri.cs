@@ -12,10 +12,33 @@ namespace _04_WebArayuzu.ViewModels;
 // ---------- 1) SINAV NOTU TAHMİNİ ----------
 public class NotFormu
 {
-    [Range(0, 6, ErrorMessage = "Çalışma saati 0-6 arasında olmalı")]
-    [Display(Name = "Çalışma süresi (saat)")]
-    public float CalismaSaati { get; set; } = 3;
-    public float? TahminiNot { get; set; }
+    // studytime alanı günlük saat değil, haftalık çalışma KATEGORİSİdir (1-4).
+    [Range(1, 4, ErrorMessage = "Çalışma kategorisi 1-4 arasında olmalı")]
+    [Display(Name = "Haftalık çalışma kategorisi (1-4)")]
+    public int Studytime { get; set; } = 2;
+
+    [Range(0, 3, ErrorMessage = "Başarısızlık sayısı 0-3 arasında olmalı")]
+    [Display(Name = "Geçmiş başarısızlık sayısı")]
+    public int Failures { get; set; } = 0;
+
+    [Display(Name = "Yükseköğrenim hedefi var mı?")]
+    public bool Higher { get; set; } = true;
+
+    [Range(0, 93, ErrorMessage = "Devamsızlık 0-93 arasında olmalı")]
+    [Display(Name = "Devamsızlık (gün)")]
+    public int Absences { get; set; } = 4;
+
+    [Range(0, 100, ErrorMessage = "1. dönem notu 0-100 arasında olmalı")]
+    [Display(Name = "1. dönem notu (0-100)")]
+    public float G1 { get; set; } = 55;
+
+    [Range(0, 100, ErrorMessage = "2. dönem notu 0-100 arasında olmalı")]
+    [Display(Name = "2. dönem notu (0-100)")]
+    public float G2 { get; set; } = 60;
+
+    // Sonuçlar
+    public float? TahminiG3 { get; set; }        // 0-20
+    public float? TahminiYuzluk { get; set; }    // 0-100
     public bool TahminYapildi { get; set; }
 }
 

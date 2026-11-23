@@ -1,24 +1,14 @@
 using Microsoft.ML;
 using Microsoft.ML.Data;
 
-// Dağıtım için ZIP model üretici. Not ve hal web servisinde CSV'den eğitilir.
-// Sınav notu CSV'si sentetiktir ve gerçek öğrenci verisi değildir.
+// Dağıtım için ZIP model üretici: duygu ve hal modelleri.
+// Sınav notu modeli 01-SinavNotu projesinde üretilir (UCI Student Performance).
 string veriYolu = Path.Combine("..", "veri");
 string ciktiKlasoru = Path.Combine("..", "04-WebArayuzu", "Ml", "Modeller");
 Directory.CreateDirectory(ciktiKlasoru);
 var ml = new MLContext(seed: 1);
 
-var notVeri = ml.Data.LoadFromTextFile<Ogrenci>(
-    Path.Combine(veriYolu, "sinav_notlari.csv"), ',', hasHeader: true);
-var notPipeline = ml.Transforms.Concatenate("Ozellikler", nameof(Ogrenci.CalismaSaati))
-    .Append(ml.Transforms.NormalizeMinMax("Ozellikler"))
-    .Append(ml.Regression.Trainers.Sdca(
-        labelColumnName: nameof(Ogrenci.SinavNotu),
-        featureColumnName: "Ozellikler",
-        maximumNumberOfIterations: 200));
-var notModel = notPipeline.Fit(notVeri);
-ml.Model.Save(notModel, notVeri.Schema, Path.Combine(ciktiKlasoru, "not-model.zip"));
-Console.WriteLine("not-model.zip: 80 sentetik öğrenci kaydı");
+// NOT: not-model.zip artık 01-SinavNotu projesinde üretiliyor (UCI Student Performance).
 
 var duyguVeri = ml.Data.LoadFromTextFile<Yorum>(Path.Combine(veriYolu, "duygu.csv"), '\t', hasHeader: true);
 var duyguPipeline = ml.Transforms.Text.FeaturizeText("Ozellikler", nameof(Yorum.yorum))

@@ -12,13 +12,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="../veri/sinav_notlari.csv" Link="veri/sinav_notlari.csv" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="../veri/hal_satislari.csv" Link="veri/hal_satislari.csv"
-             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="../veri/hal_satislari.csv" Link="veri/hal_satislari.csv" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ML" Version="4.0.2" />
+    <PackageReference Include="Microsoft.ML.FastTree" Version="4.0.2" />
   </ItemGroup>
 
 </Project>

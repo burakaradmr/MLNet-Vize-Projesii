@@ -6,7 +6,7 @@ namespace _04_WebArayuzu.Services;
 
 // ============================================================
 //  TAHMİN SERVİSİ
-//  Görev: duygu ZIP modelini yüklemek; sınav notu ve hal modellerini CSV ile eğitmek,
+//  Görev: duygu ve sınav notu ZIP modellerini yüklemek, hal modelini CSV ile eğitmek,
 //         sonra gelen isteklerde sadece tahmin üretmek.
 //
 //  Neden singleton? Program.cs'te AddSingleton ile kaydedildi.
@@ -30,18 +30,10 @@ public class TahminServisi
 
         var ml = new MLContext(seed: 1);
 
-        var notCsvYolu = Path.Combine(ortam.ContentRootPath, "veri", "sinav_notlari.csv");
-        if (!File.Exists(notCsvYolu))
-            notCsvYolu = Path.GetFullPath(Path.Combine(ortam.ContentRootPath, "..", "veri", "sinav_notlari.csv"));
-        if (!File.Exists(notCsvYolu)) throw new FileNotFoundException("Sınav notu veri dosyası bulunamadı", notCsvYolu);
-        var notVeri = ml.Data.LoadFromTextFile<Ogrenci>(notCsvYolu, separatorChar: ',', hasHeader: true);
-        var notPipeline = ml.Transforms.Concatenate("Ozellikler", nameof(Ogrenci.CalismaSaati))
-            .Append(ml.Transforms.NormalizeMinMax("Ozellikler"))
-            .Append(ml.Regression.Trainers.Sdca(
-                labelColumnName: nameof(Ogrenci.SinavNotu),
-                featureColumnName: "Ozellikler",
-                maximumNumberOfIterations: 200));
-        var notModel = notPipeline.Fit(notVeri);
+        // Sınav notu modeli: 01-SinavNotu projesinin ürettiği ZIP'ten yüklenir.
+        // (UCI Student Performance verisi; SDCA vs FastTree karşılaştırmasıyla seçildi.)
+        var notModel = ml.Model.Load(Path.Combine(klasor, "not-model.zip"), out _);
+
         var duyguModel = ml.Model.Load(Path.Combine(klasor, "duygu-model.zip"), out _);
 
         // Hal modelini eski zip yerine yedi faturanın 74 satırından eğitiyoruz.
@@ -70,12 +62,12 @@ public class TahminServisi
         _halMotoru = ml.Model.CreatePredictionEngine<HalSatisi, HalTahmini>(halModel);
     }
 
-    // 1) Sentetik çalışma saati -> tahmini sınav notu
-    public float NotTahmin(float calismaSaati)
+    // 1) Sınav notu: G3 tahmini (0-20 ölçeğinde döner)
+    public float NotTahmin(Ogrenci ogrenci)
     {
         lock (_kilit)
         {
-            return Math.Clamp(_notMotoru.Predict(new Ogrenci { CalismaSaati = calismaSaati }).Skor, 0f, 100f);
+            return Math.Clamp(_notMotoru.Predict(ogrenci).Skor, 0f, 20f);
         }
     }
 

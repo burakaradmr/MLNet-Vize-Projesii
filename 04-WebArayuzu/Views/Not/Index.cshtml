@@ -2,50 +2,119 @@
 @{
     ViewData["Title"] = "Sınav Notu Tahmini";
 }
+
+@* ============================================================
+   SINAV NOTU TAHMİNİ
+   Veri: UCI Student Performance (Portekiz lise, 2005-2006)
+   Model: 6 özellik -> G3 (0-20), ZIP'ten yüklenir.
+   ============================================================ *@
+
 <div class="row">
+
     <div class="col-lg-6">
         <div class="card shadow mb-4">
-            <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Çalışma bilgisi</h6></div>
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Öğrenci bilgileri</h6>
+            </div>
             <div class="card-body">
+
                 <form asp-controller="Not" asp-action="Index" method="post">
                     @Html.AntiForgeryToken()
                     <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
                     <div class="form-group">
-                        <label asp-for="CalismaSaati"></label>
-                        <input asp-for="CalismaSaati" type="number" min="0" max="6" step="0.5" class="form-control" />
-                        <span asp-validation-for="CalismaSaati" class="text-danger small"></span>
+                        <label asp-for="Studytime"></label>
+                        <select asp-for="Studytime" class="form-control">
+                            <option value="1">1 — haftada 2 saatten az</option>
+                            <option value="2">2 — haftada 2-5 saat</option>
+                            <option value="3">3 — haftada 5-10 saat</option>
+                            <option value="4">4 — haftada 10 saatten fazla</option>
+                        </select>
+                        <span asp-validation-for="Studytime" class="text-danger small"></span>
+                        <small class="text-muted d-block">Günlük saat değil, haftalık süre kategorisidir.</small>
                     </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label asp-for="Failures"></label>
+                            <input asp-for="Failures" type="number" min="0" max="3" class="form-control" />
+                            <span asp-validation-for="Failures" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label asp-for="Absences"></label>
+                            <input asp-for="Absences" type="number" min="0" max="93" class="form-control" />
+                            <span asp-validation-for="Absences" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Higher"></label>
+                        <select asp-for="Higher" class="form-control">
+                            <option value="true">Evet</option>
+                            <option value="false">Hayır</option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label asp-for="G1"></label>
+                            <input asp-for="G1" type="number" min="0" max="100" step="1" class="form-control" />
+                            <span asp-validation-for="G1" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label asp-for="G2"></label>
+                            <input asp-for="G2" type="number" min="0" max="100" step="1" class="form-control" />
+                            <span asp-validation-for="G2" class="text-danger small"></span>
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary btn-block">Notu tahmin et</button>
                 </form>
+
                 <p class="small text-muted mt-3 mb-0">
-                    Bu proje 80 sentetik kayıtla hazırlanmış eğitim demosudur.
-                    Gerçek öğrencilerin notlarını veya başarı ihtimallerini güvenilir biçimde tahmin etmez.
+                    Model, Portekiz'deki lise öğrencilerinin verisiyle eğitildi (UCI Student Performance, 649 kayıt).
+                    Türkiye'deki bir öğrencinin gerçek sınav sonucunu <strong>garanti etmez</strong>;
+                    yalnızca benzer geçmişe sahip öğrencilerde görülen eğilimi gösterir.
                 </p>
             </div>
         </div>
     </div>
+
     <div class="col-lg-6">
         @if (Model.TahminYapildi)
         {
             <div class="card shadow mb-4 border-left-primary">
-                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Tahmin sonucu</h6></div>
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Tahmin sonucu</h6>
+                </div>
                 <div class="card-body">
-                    <div class="small text-uppercase text-primary font-weight-bold mb-1">Tahmini sınav puanı</div>
-                    <div class="h2 mb-2 font-weight-bold text-gray-800">@Model.TahminiNot.GetValueOrDefault().ToString("F1") / 100</div>
-                    <p class="small text-muted mb-0">@Model.CalismaSaati.ToString("F1") saat çalışma için sentetik veriye göre model tahmini.</p>
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                        Tahmini yıl sonu notu (G3)
+                    </div>
+                    <div class="h2 mb-2 font-weight-bold text-gray-800">
+                        @Model.TahminiG3.GetValueOrDefault().ToString("F1") / 20
+                        <span class="text-muted h4">(@Model.TahminiYuzluk.GetValueOrDefault().ToString("F0") / 100)</span>
+                    </div>
+                    <p class="small text-muted mb-0">
+                        Haftalık kategori @Model.Studytime · @Model.Failures başarısızlık ·
+                        @Model.Absences gün devamsızlık · G1 @Model.G1.ToString("F0"), G2 @Model.G2.ToString("F0").
+                    </p>
                 </div>
             </div>
         }
         else
         {
-            <div class="card shadow mb-4"><div class="card-body text-muted small">Çalışma saatini girip tahmin et butonuna bas.</div></div>
+            <div class="card shadow mb-4">
+                <div class="card-body text-muted small">Bilgileri doldurup tahmin et butonuna bas.</div>
+            </div>
         }
+
         <div class="card shadow mb-4">
             <div class="card-body small text-muted">
                 <strong>Nasıl çalışıyor?</strong><br />
-                1) CSV'deki çalışma saatleri ve notlar okunur.<br />
-                2) Özellik vektörü hazırlanır ve SDCA regresyon modeli eğitilir.<br />
-                3) Predict yeni çalışma süresine karşılık gelen notu tahmin eder.
+                1) Altı özellik (studytime, failures, higher, absences, G1, G2) vektöre dönüştürülür.<br />
+                2) ZIP'ten yüklenen regresyon modeli G3'ü tahmin eder (0-20).<br />
+                3) Formda 0-100 girilen notlar 0-20'ye çevrilir, sonuç 100'lük ölçekte de gösterilir.
             </div>
         </div>
     </div>

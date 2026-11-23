@@ -66,11 +66,8 @@ def ayikla(yol: Path):
 
 
 def main():
-    if len(sys.argv) < 2:
-        raise SystemExit("Kullanım: python hal/fatura_ayikla.py <pdf_klasoru> [cikti.csv]")
-    kaynak = Path(sys.argv[1])
-    if not kaynak.is_dir():
-        raise SystemExit(f"PDF klasörü bulunamadı: {kaynak}")
+    kaynak = Path(sys.argv[1] if len(sys.argv) > 1 else
+                  "/home/hermes/.hermes/cache/documents/native-inputs")
     cikti = Path(sys.argv[2] if len(sys.argv) > 2 else "veri/hal_satislari.csv")
     cikti.parent.mkdir(parents=True, exist_ok=True)
 
@@ -82,12 +79,7 @@ def main():
             continue
         gorulen.add(no)
         hepsi.extend(kayitlar)
-        print(f"  {len(gorulen):>2}. dosya: {len(kayitlar):>2} kalem")
-
-    # Gerçek fatura numarasını çıktıya yazma; herkese açık veri için F01, F02 ... kullan.
-    fatura_kodlari = {no: f"F{i + 1:02d}" for i, no in enumerate(sorted(gorulen))}
-    for kayit in hepsi:
-        kayit["fatura_no"] = fatura_kodlari[kayit["fatura_no"]]
+        print(f"  {p.name[:40]:<42} {no}  {len(kayitlar):>2} kalem")
 
     with open(cikti, "w", newline="", encoding="utf-8") as f:
         yaz = csv.DictWriter(f, fieldnames=["tarih", "fatura_no", "urun", "adet",

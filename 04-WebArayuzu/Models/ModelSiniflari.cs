@@ -10,10 +10,16 @@ using Microsoft.ML.Data;
 namespace _04_WebArayuzu.Models;
 
 // ---------- 1) SINAV NOTU TAHMİNİ (SENTETİK VERİ) ----------
+// UCI Student Performance (Portekiz) — 6 özellik, hedef G3 (0-20)
 public class Ogrenci
 {
-    [LoadColumn(0)] public float CalismaSaati { get; set; }
-    [LoadColumn(1)] public float SinavNotu { get; set; }
+    public float studytime { get; set; }   // 1-4 haftalık çalışma kategorisi
+    public float failures { get; set; }    // 0-3
+    public float higher { get; set; }      // 1 = yükseköğrenim istiyor
+    public float absences { get; set; }    // 0-93
+    public float G1 { get; set; }          // 0-20
+    public float G2 { get; set; }          // 0-20
+    public float G3 { get; set; }          // hedef
 }
 public class NotTahmini
 {
