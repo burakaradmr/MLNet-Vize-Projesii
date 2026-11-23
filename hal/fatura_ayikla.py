@@ -3,7 +3,7 @@
 Hal faturalarından temiz veri çıkarır.
 
 Girdi : bir klasördeki müstahsil/komisyoncu faturaları (PDF)
-Çıktı : hal/hal_satislari.csv  (kişisel bilgi YOK)
+Çıktı : veri/hal_satislari.csv (anonim fatura kodlarıyla)
 
 Sütunlar: tarih, fatura_no, urun, adet, kg, birim_fiyat_tl, tutar_tl, net_oran
 Kişisel veri (TCKN, telefon, e-posta, adres) hiç yazılmaz.
@@ -61,13 +61,16 @@ def ayikla(yol: Path):
     # Doğrulama: satır toplamı faturanın brüt tutarına eşit olmalı
     toplam = sum(k["tutar_tl"] for k in kayitlar)
     if brut_tl and abs(toplam - brut_tl) > 0.01:
-        print(f"  UYARI: {yol.name} satır toplamı {toplam:.2f} != fatura {brut_tl:.2f}", file=sys.stderr)
+        print(f"  UYARI: satır toplamı {toplam:.2f} != fatura {brut_tl:.2f}", file=sys.stderr)
     return no.group(1), kayitlar
 
 
 def main():
-    kaynak = Path(sys.argv[1] if len(sys.argv) > 1 else
-                  "/home/hermes/.hermes/cache/documents/native-inputs")
+    if len(sys.argv) < 2:
+        raise SystemExit("Kullanım: python hal/fatura_ayikla.py <pdf_klasoru> [cikti.csv]")
+    kaynak = Path(sys.argv[1])
+    if not kaynak.is_dir():
+        raise SystemExit(f"PDF klasörü bulunamadı: {kaynak}")
     cikti = Path(sys.argv[2] if len(sys.argv) > 2 else "veri/hal_satislari.csv")
     cikti.parent.mkdir(parents=True, exist_ok=True)
 
@@ -79,7 +82,12 @@ def main():
             continue
         gorulen.add(no)
         hepsi.extend(kayitlar)
-        print(f"  {p.name[:40]:<42} {no}  {len(kayitlar):>2} kalem")
+        print(f"  Dosya {len(gorulen):02d}: {len(kayitlar)} kalem")
+
+    # Gerçek fatura numaralarını dosyaya veya konsola yazma.
+    kodlar = {no: f"F{i:02d}" for i, no in enumerate(sorted(gorulen), 1)}
+    for kayit in hepsi:
+        kayit["fatura_no"] = kodlar[kayit["fatura_no"]]
 
     with open(cikti, "w", newline="", encoding="utf-8") as f:
         yaz = csv.DictWriter(f, fieldnames=["tarih", "fatura_no", "urun", "adet",

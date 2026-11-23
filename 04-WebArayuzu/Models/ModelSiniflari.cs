@@ -2,14 +2,13 @@ using Microsoft.ML.Data;
 
 // ============================================================
 //  MODEL GİRDİ/ÇIKTI SINIFLARI
-//  Bu sınıflar, modeli eğiten 05-ModelEgitici projesindeki
-//  sınıflarla aynı isim ve sıradadır. Model dosyası bu isimlere
-//  göre bağlanır; isim değişirse tahmin çalışmaz.
+//  Eğitimde kullanılan sütun isimleri ve türleriyle uyumlu olmalıdır.
+//  Özellik isimlerini değiştirmek kaydedilmiş modelin giriş şemasını bozabilir.
 // ============================================================
 
 namespace _04_WebArayuzu.Models;
 
-// ---------- 1) SINAV NOTU TAHMİNİ (SENTETİK VERİ) ----------
+// ---------- 1) SINAV NOTU TAHMİNİ (UCI VERİSİ) ----------
 // UCI Student Performance (Portekiz) — 6 özellik, hedef G3 (0-20)
 public class Ogrenci
 {

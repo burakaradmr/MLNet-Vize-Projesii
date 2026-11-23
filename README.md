@@ -1,36 +1,87 @@
-# ML.NET — Üç Örnek
+# ML.NET Vize Projesi
 
-.NET 7 + ML.NET 4.0.2 ile üç eğitim projesi ve ASP.NET Core MVC uygulaması.
+C# ve ML.NET ile geliştirilmiş üç makine öğrenmesi örneği ve ASP.NET Core MVC web uygulaması.
 
-| Proje | Tür | Veriler |
+## Projeler
+
+| Klasör | Problem | Veri ve yöntem |
 |---|---|---|
-| `01-SinavNotu` | SDCA / FastTree regresyon, 6 özellik → G3 | **UCI Student Performance** (student-por), 649 satır |
-| `02-DuyguAnalizi` | SDCA lojistik regresyon, yorum → olumlu/olumsuz | UCI'den 3.000 İngilizce yorum |
-| `03-HalFiyat` | SDCA regresyon, ürün → TL/kg + eşik uyarısı | Anonimleştirilmiş 7 faturadan 74 satış satırı |
+| `01-SinavNotu` | Yıl sonu not tahmini (regresyon) | UCI Student Performance, 649 öğrenci; 6 özellik; SDCA / FastTree karşılaştırması |
+| `02-DuyguAnalizi` | Olumlu/olumsuz metin sınıflandırması | UCI Sentiment Labelled Sentences, 3.000 İngilizce cümle; FeaturizeText + SDCA Logistic Regression |
+| `03-HalFiyat` | Ürün bazlı TL/kg tahmini | Anonimleştirilmiş 7 fatura, 74 satış satırı; OneHotEncoding + SDCA |
+| `04-WebArayuzu` | Web arayüzü | ASP.NET Core MVC; `/Not`, `/Duygu`, `/Hal` |
+| `05-ModelEgitici` | Model eğitimi | Duygu ve hal modeli ZIP çıktıları; not modeli `01-SinavNotu` tarafından oluşturulur |
 
-## Çalıştırma
+## Gereksinimler
+
+- .NET 7 SDK
+- ML.NET 4.0.2
+- İnternet erişimi (NuGet bağımlılıklarını indirmek için)
+
+> .NET 7'nin destek süresi dolmuştur. Uzun süreli kullanım için desteklenen bir .NET sürümüne geçilmelidir.
+
+## Derleme ve çalıştırma
+
+```bash
+dotnet build MLNet-Vize-Projesi.sln -c Release
+```
+
+Konsol projeleri kendi dizinlerinden çalıştırılır:
 
 ```bash
 cd 01-SinavNotu && dotnet run
 cd ../02-DuyguAnalizi && dotnet run
 cd ../03-HalFiyat && dotnet run
-cd ../04-WebArayuzu && dotnet run --urls http://127.0.0.1:5300
 ```
 
-Her konsol projesi kendi klasöründen çalıştırılır. Modellerin ZIP sürümünü yeniden üretmek için `05-ModelEgitici` içinde `dotnet run` çalıştırılabilir. Web uygulaması not ve hal modellerini servis ilk oluşturulduğunda CSV'den eğitir; duygu modelini ZIP'ten yükler.
+Web uygulaması:
 
-## Sınav notu örneği
+```bash
+cd 04-WebArayuzu
+dotnet run --urls http://127.0.0.1:5300
+```
 
-Veri: **UCI Student Performance** — Cortez & Silva (2008), Portekiz lise öğrencileri, `student-por.csv` (649 satır, CC BY 4.0). Kullanılan alanlar: `studytime` (haftalık çalışma **kategorisi** 1-4, günlük saat değil), `failures`, `higher`, `absences`, `G1`, `G2`; hedef `G3` (0-20). Ham dosya `veri/student-por.csv`, modele uygun sayısal sürüm `veri/sinav_notu_model.csv` (`araclar/student_por_hazirla.py` üretir). Aynı sabit %80/%20 bölünmesinde **SDCA** (R² 0,782 · MAE 0,95 · RMSE 1,66) ve **FastTree** (R² 0,754 · MAE 1,09 · RMSE 1,76) karşılaştırıldı; düşük test RMSE nedeniyle SDCA seçildi ve `not-model.zip` olarak kaydedildi. Normalizasyon pipeline içinde yalnızca eğitim verisiyle öğrenilir; test verisine önceden uygulanmaz. Atıf: Cortez, P., & Silva, A. (2008). Using Data Mining to Predict Secondary School Student Performance. Sonuçlar Portekiz verisine dayanır; Türkiye'deki bir öğrencinin gerçek sınav sonucunu garanti etmez.
+Web uygulaması sınav notu ve duygu modellerini `Ml/Modeller` klasöründeki ZIP dosyalarından yükler. Hal fiyat modelini ise başlangıçta `veri/hal_satislari.csv` verileriyle eğitir. Yeni kullanıcı girdileri modeli otomatik olarak yeniden eğitmez.
 
-## Hal fiyatı sınırı
+## Sınav notu tahmini
 
-Hal modeli yalnızca **ürün adından** fiyat tahmin eder; KG gerçek model özelliği değildir. Uyarı `gerçek fiyat < beklenen × 0,8` şeklinde elle tanımlanmış bir kuraldır, ayrı anomali modeli değildir. 5-kat CV R² yaklaşık 0,764 ve MAE 3,32 TL/kg olsa da aynı faturadaki ilişkili satırlar nedeniyle iyimser olabilir.
+Kaynak: **UCI Student Performance** (`veri/student-por.csv`, 649 Portekiz lise öğrencisi).
 
-## Yayın
+- Girdiler: `studytime` (haftalık çalışma süresi kategorisi 1–4), `failures`, `higher`, `absences`, `G1`, `G2`
+- Hedef: `G3` (0–20); arayüzde 100 üzerinden karşılığı da gösterilir
+- Sabit eğitim/test ayrımında raporlanan sonuçlar:
 
-Web arayüzü Cloudflare Tunnel üzerinden `https://mlnet.burakkarademir.dev` alan adına yönlendirilebilir. Yayını bu commit otomatik gerçekleştirmez. Local servisin gerçek durumu sunucuda doğrulanmalıdır. Kurulum için `DEPLOY-HERMES.md` dosyasına bakın.
+| Model | R² | MAE (0–20) | RMSE (0–20) |
+|---|---:|---:|---:|
+| SDCA | 0,782 | 0,95 | 1,66 |
+| FastTree | 0,754 | 1,09 | 1,76 |
 
-## Güvenlik
+Bu çalışmada SDCA, daha düşük test RMSE ile seçilmiştir. Algoritmanın aynı test kümesine göre seçilmiş olması nedeniyle bu değerler bağımsız bir nihai değerlendirme olarak yorumlanmamalıdır. Sonuçlar Türkiye'deki öğrenciler için doğrulanmış bir tahmin sistemi değildir.
 
-**Repo private kalmalı:** eski Git geçmişinde gerçek fatura numaraları bulunuyor. GitHub görünürlüğünü değiştirmeden önce temiz geçmişli yeni bir repo oluşturulmalı. .NET 7 destek dışıdır; üretimde desteklenen .NET LTS'e geçiş planlanmalı.
+## Duygu analizi
+
+İngilizce yorumlar sayısal özelliklere çevrilir ve ikili sınıflandırma yapılır. Raporlanan test doğruluğu yaklaşık %75,6'dır. `Predict()` yeni yorumlardan otomatik öğrenmez.
+
+## Hal fiyatı tahmini
+
+Model yalnızca **ürün adından** beklenen TL/kg değerini tahmin eder; kg bilgisi tahmini gelir hesabında kullanılır. Gerçek fiyatın beklenen değerin %80'inden düşük olması durumunda gösterilen uyarı **kural tabanlıdır**, ayrı bir anomali modeli değildir. Yedi faturadaki satırlar birbirine bağlı olduğundan satır bazlı çapraz doğrulama sonuçları iyimser olabilir.
+
+Fatura işleme betiği, yerel PDF klasörü açıkça verilerek çalıştırılır:
+
+```bash
+python hal/fatura_ayikla.py <pdf_klasoru> [cikti.csv]
+```
+
+Betiğin ürettiği fatura kodları anonimdir. CSV'yi yayımlamadan önce kişisel ve ticari bilgileri ayrıca kontrol edin.
+
+## Veri kaynakları ve atıf
+
+Lisans ve kaynak açıklamaları: [veri/KAYNAK.md](veri/KAYNAK.md).
+
+- Cortez, P. & Silva, A. (2008), *Using Data Mining to Predict Secondary School Student Performance*.
+- [UCI Student Performance](https://archive.ics.uci.edu/dataset/320/student+performance).
+- [UCI Sentiment Labelled Sentences](https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences).
+
+## Canlı uygulama
+
+https://mlnet.burakkarademir.dev

@@ -30,7 +30,7 @@ Bu klasörde iki kamuya açık UCI veri seti ve özel kaynaklı hal faturaları 
 - **Satır:** 74 (ürün, paket adedi, kg, fiyat, tutar).
 - **Ürünler:** kereviz, pırasa, brokoli, karalahana, karnabahar.
 - **Çıkarım:** UBL XML'den satış satırı ve ADET alt satırı alındı; satır tutarları doğrulandı. Fatura numaraları F01–F07 olarak anonimleştirildi.
-- **Gizlilik:** TCKN, telefon, adres ve gerçek fatura numaraları yeni CSV'de yok; tarihler ve ticari fiyatlar özel tutulmalıdır.
+- **Gizlilik:** TCKN, telefon, adres ve gerçek fatura numaraları yeni CSV'de yok; tarih ve fiyat bilgileri bu yayımlanan örnek veri setinde yer alır.
 - **Kesinti:** komisyon %8 + KDV %20 + tevkiifat %2 + diğer %1,5 ≈ net/brüt oranı 0,869.
 
 ## Kaldırılan veri
