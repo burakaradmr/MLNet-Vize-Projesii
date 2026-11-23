@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+<div class="card shadow mb-4">
+    <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">ML.NET nedir?</h6></div>
+    <div class="card-body">
+        <p>ML.NET, Microsoft'un C# ve .NET ile makine öğrenmesi yapmaya yarayan açık kaynak kütüphanesidir.</p>
+        <p class="mb-0 text-muted">Üç örnek: sentetik verilerle not regresyonu, gerçek İngilizce yorumlarla duygu sınıflandırması ve anonimleştirilmiş hal satışlarıyla ürün fiyatı regresyonu. Not ve hal modelleri CSV'den servis oluşturulduğunda eğitilir; duygu modeli ZIP'ten yüklenir.</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-4"><div class="card shadow mb-4"><div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">1 · Sınav Notu Tahmini</h6></div><div class="card-body"><p class="small">SDCA regresyon · 80 <strong>sentetik</strong> kayıt · çalışma saati → 0-100 not</p><p class="small text-muted">Öğretici gösterimdir, gerçek öğrenci başarısı tahmini değildir.</p><a class="btn btn-primary btn-sm" asp-controller="Not" asp-action="Index">Not tahmini</a></div></div></div>
+    <div class="col-lg-4"><div class="card shadow mb-4"><div class="card-header py-3"><h6 class="m-0 font-weight-bold text-success">2 · Duygu Analizi</h6></div><div class="card-body"><p class="small">İkili sınıflandırma · 3.000 İngilizce yorum</p><p class="small text-muted">FeaturizeText ve SDCA lojistik regresyon ile olumlu / olumsuz tahmini.</p><a class="btn btn-success btn-sm" asp-controller="Duygu" asp-action="Index">Duygu analizi</a></div></div></div>
+    <div class="col-lg-4"><div class="card shadow mb-4"><div class="card-header py-3"><h6 class="m-0 font-weight-bold text-warning">3 · Hal Satış Fiyatı</h6></div><div class="card-body"><p class="small">SDCA regresyon + eşik uyarısı · 74 satır, 7 fatura</p><p class="small text-muted">Ürün adından TL/kg tahmini; düşük gerçek fiyata kural tabanlı uyarı.</p><a class="btn btn-warning btn-sm" asp-controller="Hal" asp-action="Index">Hal fiyatı</a></div></div></div>
+</div>
+<div class="card shadow mb-4"><div class="card-body">
+    <strong>Değerlendirme notu:</strong>
+    <p class="small text-muted mb-0">Not tahmini verileri sentetiktir; konsol uygulaması R², MAE ve RMSE hesaplar. Sonuçlar çalıştırılmadan sabit metrik iddia edilmez. Duygu test doğruluğu yaklaşık %75,6; hal fiyatında 5 katlı CV R² yaklaşık 0,764 (aynı faturadan satırlar nedeniyle iyimser olabilir).</p>
+</div></div>

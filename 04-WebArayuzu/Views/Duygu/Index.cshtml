@@ -1,0 +1,81 @@
+@model _04_WebArayuzu.ViewModels.DuyguFormu
+@{
+    ViewData["Title"] = "Duygu Analizi";
+}
+
+@* ============================================================
+   DUYGU ANALİZİ SAYFASI
+   Metin kutusu + sonuç kartı (yeşil/kırmızı).
+   ============================================================ *@
+
+<div class="row">
+
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-success">Yorum gir</h6>
+            </div>
+            <div class="card-body">
+
+                <form asp-controller="Duygu" asp-action="Index" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+                    <div class="form-group">
+                        <label asp-for="Yorum"></label>
+                        <textarea asp-for="Yorum" class="form-control" rows="4"
+                                  placeholder="This product works great and arrived early."></textarea>
+                        <span asp-validation-for="Yorum" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-block">Duyguyu tahmin et</button>
+                </form>
+
+                <p class="small text-muted mt-3 mb-0">
+                    Model <strong>İngilizce</strong> yorumlarla eğitildi (IMDb + Yelp + Amazon).
+                    Türkçe metinlerde sonuç güvenilir değildir.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        @if (Model.TahminYapildi)
+        {
+            var olumlu = Model.Olumlu == true;
+            var renk = olumlu ? "success" : "danger";
+            <div class="card shadow mb-4 border-left-@renk">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-@renk">Tahmin sonucu</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-@renk text-uppercase mb-1">Duygu</div>
+                    <div class="h3 mb-2 font-weight-bold text-gray-800">
+                        @(olumlu ? "OLUMLU" : "OLUMSUZ")
+                    </div>
+
+                    <div class="small text-muted mb-1">
+                        Modelin bu karara güveni: %@((Model.Guven.GetValueOrDefault() * 100).ToString("F1").Replace('.', ','))
+                    </div>
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar bg-@renk" role="progressbar"
+                             style="width: @((Model.Guven.GetValueOrDefault() * 100).ToString("F0"))%"></div>
+                    </div>
+
+                    <p class="small text-muted mb-0">
+                        Güven, olumsuz tahminde <code>1 - Probability</code> ile hesaplanır;
+                        çünkü modelin olasılık çıktısı olumlu sınıfa aittir.
+                    </p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card shadow mb-4">
+                <div class="card-body text-muted small">
+                    Bir yorum yazıp <strong>Duyguyu tahmin et</strong> butonuna bas.
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,52 @@
+@model _04_WebArayuzu.ViewModels.NotFormu
+@{
+    ViewData["Title"] = "Sınav Notu Tahmini";
+}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Çalışma bilgisi</h6></div>
+            <div class="card-body">
+                <form asp-controller="Not" asp-action="Index" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+                    <div class="form-group">
+                        <label asp-for="CalismaSaati"></label>
+                        <input asp-for="CalismaSaati" type="number" min="0" max="6" step="0.5" class="form-control" />
+                        <span asp-validation-for="CalismaSaati" class="text-danger small"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Notu tahmin et</button>
+                </form>
+                <p class="small text-muted mt-3 mb-0">
+                    Bu proje 80 sentetik kayıtla hazırlanmış eğitim demosudur.
+                    Gerçek öğrencilerin notlarını veya başarı ihtimallerini güvenilir biçimde tahmin etmez.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        @if (Model.TahminYapildi)
+        {
+            <div class="card shadow mb-4 border-left-primary">
+                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Tahmin sonucu</h6></div>
+                <div class="card-body">
+                    <div class="small text-uppercase text-primary font-weight-bold mb-1">Tahmini sınav puanı</div>
+                    <div class="h2 mb-2 font-weight-bold text-gray-800">@Model.TahminiNot.GetValueOrDefault().ToString("F1") / 100</div>
+                    <p class="small text-muted mb-0">@Model.CalismaSaati.ToString("F1") saat çalışma için sentetik veriye göre model tahmini.</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card shadow mb-4"><div class="card-body text-muted small">Çalışma saatini girip tahmin et butonuna bas.</div></div>
+        }
+        <div class="card shadow mb-4">
+            <div class="card-body small text-muted">
+                <strong>Nasıl çalışıyor?</strong><br />
+                1) CSV'deki çalışma saatleri ve notlar okunur.<br />
+                2) Özellik vektörü hazırlanır ve SDCA regresyon modeli eğitilir.<br />
+                3) Predict yeni çalışma süresine karşılık gelen notu tahmin eder.
+            </div>
+        </div>
+    </div>
+</div>

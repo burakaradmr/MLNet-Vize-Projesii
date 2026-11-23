@@ -1,0 +1,121 @@
+﻿@* ============================================================
+   ORTAK İSKELET (Layout)
+   SB Admin 2 teması: solda koyu menü, üstte bar, ortada içerik.
+   Her sayfa bu iskeletin içine @RenderBody() ile yerleşir.
+   ============================================================ *@
+@{
+    var aktif = ViewData["Aktif"] as string ?? "";
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ML.NET Vize</title>
+
+    @* SB Admin 2 + Bootstrap 4 (yerel dosyalar, internet gerekmez) *@
+    <link rel="stylesheet" href="~/lib/sbadmin2/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/sbadmin2/sb-admin-2.min.css" />
+    @* genislik-guard: SB Admin 2 bazen menüye "toggled" ekliyor ve geniş ekranda
+       menü 224px'den 104px'e düşüp yazılar sayfanın üstüne taşıyor. Geniş ekranda engelliyoruz. *@
+    <style>
+        @@media (min-width: 768px) {
+            #accordionSidebar.toggled { width: 14rem !important; }
+            #accordionSidebar.toggled .nav-item .nav-link span,
+            #accordionSidebar.toggled .sidebar-heading,
+            #accordionSidebar.toggled .sidebar-brand-text { display: inline !important; }
+        }
+    </style>
+</head>
+<body id="page-top">
+
+<div id="wrapper">
+
+    @* ---------- SOL MENÜ ---------- *@
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" asp-controller="Home" asp-action="Index">
+            <div class="sidebar-brand-text mx-3">ML.NET Vize</div>
+        </a>
+
+        <hr class="sidebar-divider my-0" />
+
+        <li class="nav-item @(aktif == "home" ? "active" : "")">
+            <a class="nav-link" asp-controller="Home" asp-action="Index">
+                <span>Ana Sayfa</span>
+            </a>
+        </li>
+
+        <hr class="sidebar-divider" />
+        <div class="sidebar-heading">Örnekler</div>
+
+        <li class="nav-item @(aktif == "not" ? "active" : "")">
+            <a class="nav-link" asp-controller="Not" asp-action="Index">
+                <span>Sınav Notu Tahmini</span>
+            </a>
+        </li>
+
+        <li class="nav-item @(aktif == "duygu" ? "active" : "")">
+            <a class="nav-link" asp-controller="Duygu" asp-action="Index">
+                <span>Duygu Analizi</span>
+            </a>
+        </li>
+
+        <li class="nav-item @(aktif == "hal" ? "active" : "")">
+            <a class="nav-link" asp-controller="Hal" asp-action="Index">
+                <span>Hal Satış Fiyatı</span>
+            </a>
+        </li>
+    </ul>
+
+    @* ---------- SAĞ TARAF: içerik ---------- *@
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+
+            @* Üst bar *@
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <h1 class="h5 mb-0 text-gray-800">@ViewData["Title"]</h1>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item d-none d-sm-inline-block">
+                        <span class="nav-link text-muted small">net7.0 · ML.NET 4.0.2</span>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="container-fluid">
+                @RenderBody()
+            </div>
+        </div>
+
+        @* Alt bilgi *@
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>ML.NET vize projesi · üç örnek, tek arayüz</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<a class="scroll-to-top rounded" href="#page-top">
+    <span>&uarr;</span>
+</a>
+
+<script src="~/lib/sbadmin2/jquery.min.js"></script>
+<script src="~/lib/sbadmin2/bootstrap.bundle.min.js"></script>
+<script src="~/lib/sbadmin2/sb-admin-2.min.js"></script>
+<script>
+    // SB Admin 2 betiği form gönderiminden sonra menüye "toggled" sınıfı ekliyor ve
+    // menü 224px'den 104px'e düşüp yazılar taşıyor. Geniş ekranda bunu geri alıyoruz.
+    window.addEventListener('load', function () {
+        if (window.innerWidth >= 768) {
+            document.querySelectorAll('.sidebar.toggled').forEach(function (el) {
+                el.classList.remove('toggled');
+            });
+        }
+    });
+</script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

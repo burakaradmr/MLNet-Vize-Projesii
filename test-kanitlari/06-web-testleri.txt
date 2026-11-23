@@ -1,0 +1,30 @@
+=== WEB ARAYÜZÜ TESTLERİ (74 satır / 7 fatura sürümü) ===
+Uygulama : 04-WebArayuzu (net7.0, SB Admin 2) · http://127.0.0.1:5300
+Hal modeli: uygulama açılışında veri/hal_satislari.csv (74 satır) ile eğitilir
+Yakıt/duygu: Ml/Modeller/*.zip dosyalarından yüklenir
+
+--- GET ---
+/       -> HTTP 200
+/Hal    -> HTTP 200   (6 ürün seçeneği: KEREVIZ, KARALAHANA, PIRASA, BROKOLI, KARNABAHAR, BEYAZ LAHANA)
+
+--- Bugünkü sevkiyat tablosu (GET /Hal) ---
+Ürün          Adet   Tahmini kg   ML.NET TL/kg   Brüt TL
+PIRASA         10        176,0         38,55        6.786
+KEREVIZ        18        344,6         35,68       12.298
+BROKOLI         4         73,0         23,80        1.737
+BEYAZ LAHANA    4      veri yok      veri yok      veri yok
+KARALAHANA     53      1.620,1        16,93       27.430
+Bilinen 4 ürün toplamı: 48.251 TL   (beyaz lahana veri dışı)
+
+--- POST ---
+PIRASA · 176 kg
+  -> Beklenen 38,55 TL/kg · beklenen gelir 6.785 TL
+KARALAHANA · 100 kg · gerçek 10 TL/kg
+  -> Beklenen 16,93 TL/kg · UYARI: beklenenin %41 altında
+BEYAZ LAHANA · 20 kg
+  -> "Veri yok" + "Bu ürün için geçmiş satış verisi yok. Fiyat tahmini üretilemez."
+
+--- Model ---
+Hal modeli 74 satırla eğitildi; 5 katlı çapraz doğrulama:
+R² 0.764 · MAE 3,32 TL/kg · RMSE 4,21 TL/kg
+Eski 31 satırlık hal-model.zip kullanılmıyor (repodan kaldırıldı).

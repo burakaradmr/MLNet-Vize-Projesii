@@ -1,0 +1,7 @@
+=== SINAV NOTU TAHMİNİ — SENTETİK VERİ DEMOSU ===
+Veri: 80 sentetik kayıt; yaklaşık %80 eğitim / %20 test
+R²: 0.920 | MAE: 4.70 puan | RMSE: 5.57 puan
+1 saat çalışma -> tahmini 35.4 / 100
+3 saat çalışma -> tahmini 53.8 / 100
+5 saat çalışma -> tahmini 72.1 / 100
+Uyarı: Sentetik ve tek özellikli örnek gerçek öğrenci başarısını öngörmez.
