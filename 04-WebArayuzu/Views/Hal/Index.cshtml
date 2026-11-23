@@ -1,0 +1,137 @@
+@model _04_WebArayuzu.ViewModels.HalFormu
+@{
+    ViewData["Title"] = "Hal Satış Fiyatı";
+}
+
+@* ============================================================
+   HAL SATIŞ FİYATI SAYFASI
+   Gerçek faturalardan öğrenilmiş model: ürün adı -> TL/kg.
+   Gerçek fiyat girilirse "ucuza gitti" uyarısı da çıkar.
+   ============================================================ *@
+
+<div class="row">
+
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-warning">Satış bilgisi</h6>
+            </div>
+            <div class="card-body">
+
+                <form asp-controller="Hal" asp-action="Index" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+                    <div class="form-group">
+                        <label asp-for="Urun"></label>
+                        <select asp-for="Urun" class="form-control">
+                            @foreach (var u in _04_WebArayuzu.Controllers.HalController.Urunler)
+                            {
+                                <option value="@u">@u</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Urun" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Kg"></label>
+                        <input asp-for="Kg" class="form-control" />
+                        <span asp-validation-for="Kg" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="GercekFiyat"></label>
+                        <input asp-for="GercekFiyat" class="form-control" placeholder="boş bırakılabilir" />
+                        <span asp-validation-for="GercekFiyat" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning btn-block">Fiyatı tahmin et</button>
+                </form>
+
+                <p class="small text-muted mt-3 mb-0">
+                    Model <strong>7 gerçek hal faturasındaki 74 satış satırıyla</strong> eğitilir.
+                    Geçmiş satışlar gelecekteki fiyatı garanti etmez; bu yüzden sayı "kesin fiyat" değil,
+                    <em>beklenen seviye</em> olarak okunmalı.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        @if (Model.TahminYapildi)
+        {
+            var uyariVar = !string.IsNullOrEmpty(Model.Uyari);
+            <div class="card shadow mb-4 border-left-@(uyariVar ? "danger" : "warning")">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-@(uyariVar ? "danger" : "warning")">Tahmin sonucu</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Beklenen fiyat</div>
+                    <div class="h2 mb-3 font-weight-bold text-gray-800">
+                        @(Model.BeklenenFiyat.HasValue ? Model.BeklenenFiyat.Value.ToString("N2") + " TL/kg" : "Veri yok")
+                    </div>
+
+                    <p class="small mb-1">
+                        @Model.Kg.ToString("0") kg için beklenen gelir:
+                        <strong>@(Model.TahminiGelir.HasValue ? Model.TahminiGelir.Value.ToString("N0") + " TL" : "Veri yok")</strong>
+                    </p>
+                    <p class="small text-muted mb-0">
+                        (Komisyon ve masraflar düşülmeden önceki brüt tutar)
+                    </p>
+
+                    @if (uyariVar)
+                    {
+                        <div class="alert alert-danger mt-3 mb-0 py-2 small">@Model.Uyari</div>
+                    }
+                    else if (Model.GercekFiyat.HasValue)
+                    {
+                        <div class="alert alert-success mt-3 mb-0 py-2 small">
+                            Fiyat beklenen seviyede — anormal bir düşüş yok.
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card shadow mb-4">
+                <div class="card-body text-muted small">
+                    Ürün ve kg gir; beklenen fiyat burada görünecek.
+                </div>
+            </div>
+        }
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-warning">Bugünkü sevkiyat (paket/kasa)</h6></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead><tr><th>Ürün</th><th>Adet</th><th>Tahmini kg</th><th>ML.NET TL/kg</th><th>Brüt TL</th></tr></thead>
+                        <tbody>
+                        @foreach (var s in Model.Sevkiyat)
+                        {
+                            <tr>
+                                <td>@s.Urun</td>
+                                <td>@s.Paket</td>
+                                <td>@(s.Kg.HasValue ? s.Kg.Value.ToString("N1") : "veri yok")</td>
+                                <td>@(s.Fiyat.HasValue ? s.Fiyat.Value.ToString("N2") : "veri yok")</td>
+                                <td>@(s.Brut.HasValue ? s.Brut.Value.ToString("N0") : "veri yok")</td>
+                            </tr>
+                        }
+                        </tbody>
+                        <tfoot><tr><th colspan="4">Bilinen 4 ürün toplamı</th><th>@(Model.Sevkiyat.Sum(s => s.Brut ?? 0f).ToString("N0")) TL</th></tr></tfoot>
+                    </table>
+                </div>
+                <p class="small text-muted">Kg = faturaların kg/adet ortalaması × yeni adet. Beyaz lahana için veri yoktur. Fiyatlar yalnızca geçmişten öğrenilen tahminlerdir; komisyon ve masraf düşülmemiştir.</p>
+            </div>
+        </div>
+        <div class="card shadow mb-4">
+            <div class="card-body small text-muted">
+                <strong>Nasıl çalışıyor?</strong><br />
+                1) Model ürünün geçmiş fiyatlarından beklenen TL/kg hesaplar (regresyon).<br />
+                2) Gerçek fiyat girildiyse beklenenin %20 altındaysa bir eşik uyarısı verir; ayrı bir anomali modeli değildir.<br />
+                3) Eşik kuralı konsol projesindekiyle aynıdır; model eğitim verileri de eşit olmalıdır.
+            </div>
+        </div>
+    </div>
+</div>

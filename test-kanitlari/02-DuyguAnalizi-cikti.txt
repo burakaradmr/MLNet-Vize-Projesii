@@ -1,0 +1,15 @@
+=== ÖRNEK 2: Yorum duygu analizi (ikili sınıflandırma) ===
+Eğitim satırı : 2378
+Test satırı   : 622
+Doğruluk (Accuracy) : 75.6%
+AUC                 : 0.837  (0.5 = rastgele, 1.0 = mükemmel)
+F1 skoru            : 0.762
+Kesinlik / Duyarlılık: 72.8% / 79.9%
+
+Örnek tahminler:
+  [OLUMLU] %76.1 güven — This movie was absolutely wonderful, I loved every minute of it.
+  [OLUMSUZ] %65.2 güven — Terrible product, it broke after two days and support ignored me.
+  [OLUMSUZ] %57.3 güven — The battery life is okay but the screen is a bit dim.
+  [OLUMLU] %94.4 güven — Best purchase I have made this year, works perfectly.
+
+Not: Aynı metin farklı veri setinde farklı sonuç verebilir; model 3.000 yorumla eğitildi.

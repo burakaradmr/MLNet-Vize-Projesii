@@ -1,0 +1,36 @@
+# ---- .NET derleme çıktıları ----
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+
+# ---- geçici / yedek dosyalar ----
+*.tmp
+*.bak
+*.eski
+*.swp
+*~
+
+# ---- loglar ----
+*.log
+logs/
+TestResults/
+
+# ---- macOS / Windows artıkları ----
+__MACOSX/
+.DS_Store
+
+# ---- işletim sistemi ----
+Thumbs.db
+
+# ---- yerel ayarlar ve sırlar ----
+appsettings.*.local.json
+.env
+.env.*
+secrets.json
+
+# ---- not ----
+# Ml/Modeller/*.zip KASITLI olarak takip edilir:
+# eğitilmiş modeller olmadan web uygulaması çalışmaz.
